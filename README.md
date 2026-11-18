@@ -123,7 +123,7 @@ After auditing top-5 free hosting alternatives to HF Spaces and Vercel (see [`do
 
 | Priority | Provider | Why | Deploy script |
 |---|---|---|---|
-| 1 (PRIMARY) | Northflank Sandbox | Always-on + no card + Docker — only platform with all three | [`oc-proxy/deploy-oc-proxy-northflank.sh`](./oc-proxy/deploy-oc-proxy-northflank.sh) |
+| 1 (PRIMARY) | Northflank Sandbox | **LIVE 2026-11-18** — always-on, no card, Docker; `web--oc-proxy--kn9sfsrmdk4x.code.run` | [`oc-proxy/deploy-oc-proxy-northflank.sh`](./oc-proxy/deploy-oc-proxy-northflank.sh) |
 | 2 (FALLBACK) | Render free tier | 750 h/month, 15-min sleep, Docker+WS supported, no card | (TODO: `deploy-oc-proxy-render.sh`) |
 | 3 (OFF-BOX) | Oracle Cloud Always Free + Coolify | True always-on VM, hosts Layer W too, card required | (TODO: `deploy-oc-proxy-oracle.sh`) |
 

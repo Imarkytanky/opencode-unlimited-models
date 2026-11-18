@@ -175,16 +175,10 @@
       "name": "OpenCode Zen Free (via oc-proxy Northflank \u2014 PRIMARY)",
       "package": "@opencode/ai/providers/openai-compatible",
       "settings": {
-        "baseURL": "https://oc-proxy-northflank.invalid/v1",
+        "baseURL": "https://web--oc-proxy--kn9sfsrmdk4x.code.run/v1",
         "apiKey": "{env:OC_PROXY_NF_KEY}"
       },
       "models": {
-        "glm-5.3-flash-free": {
-          "name": "GLM 5.3 Flash (free)",
-          "capabilities": {
-            "tools": true
-          }
-        },
         "deepseek-v4.1-flash-free": {
           "name": "DeepSeek V4.1 Flash (free)",
           "capabilities": {
@@ -196,8 +190,8 @@
         "priority": 1,
         "deployScript": "oc-proxy/deploy-oc-proxy-northflank.sh",
         "envVar": "OC_PROXY_NF_KEY",
-        "live": false,
-        "notes": "Always-on, no sleep, no card, Docker-native. Free Sandbox tier (2 services, up to $20/mo). Activated by step 8 of deploy-oc-proxy-northflank.sh at the HEALTHY gate."
+        "live": true,
+        "notes": "LIVE 2026-11-18 via Northflank combined service (us-central, nf-compute-20). glm-5.3-flash-free deprecated upstream (410 ModelDeprecated); deepseek-v4.1-flash-free is the live replacement. Auth gate enforced (401 without key). Original pin: 2a41370e4ee121796bdbf65a2efeae99e80b58d1."
       }
     },
     "oc-proxy-render": {
@@ -268,6 +262,22 @@
     "offBox": "oc-proxy-oracle",
     "upstreamPin": "2a41370e4ee121796bdbf65a2efeae99e80b58d1",
     "invariant": "Each provider's baseURL starts as <name>.invalid/v1 (RFC 2606) so D_thin reconcile sees the slot but no model resolves. Deploy scripts overwrite baseURL at the RUNNING gate.",
-    "failover": "If primary returns 5xx or timeout > 5s, Layer B consumers should fall through to the next provider by priority. Implement in the D_thin reconcile plugin or in the OpenCode SDK client."
+    "failover": "If primary returns 5xx or timeout > 5s, Layer B consumers should fall through to the next provider by priority. Implement in the D_thin reconcile plugin or in the OpenCode SDK client.",
+    "deployedAt": "2026-11-18T09:30:00Z",
+    "liveURL": "https://web--oc-proxy--kn9sfsrmdk4x.code.run",
+    "gatewayKeyEnvVar": "OC_PROXY_NF_KEY",
+    "northflank": {
+      "project": "default",
+      "service": "oc-proxy",
+      "serviceType": "combined",
+      "region": "us-central",
+      "cluster": "nf-us-central",
+      "publicDomain": "web--oc-proxy--kn9sfsrmdk4x.code.run",
+      "deploymentPlan": "nf-compute-20",
+      "buildPlan": "nf-compute-400-16",
+      "buildId": "excited-voyage-4622",
+      "buildSha": "7f339e9114fb30625d6c080e3d5a24969335661e",
+      "distRepo": "https://github.com/Imarkytanky/oc-proxy-northflank-dist"
+    }
   }
 }
