@@ -1,0 +1,142 @@
+NOTICE — opencode-unlimited-models-final
+=========================================
+
+This bundle incorporates code from the following upstream projects.
+All upstream licenses are preserved in their respective subdirectories.
+
+────────────────────────────────────────────────────────────────────────
+1. browser-search (Layer W)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/Johell1NS/browser-search
+   Version:   v3.2.1 (commit 81c4025, 2026-10-22)
+   License:   MIT (see browser-search/LICENSE)
+   Vendor:    Johell1NS and contributors
+
+   What's included:
+     - browser-search/SKILL.md          (opencode skill definition, verbatim)
+     - browser-search/scripts/           (deterministic Node scripts, verbatim)
+     - browser-search/data/              (reference docs, verbatim)
+     - browser-search/docker/            (Docker setup reference, verbatim)
+     - browser-search/i18n/              (translated READMEs, verbatim)
+     - browser-search/package.json       (dependency manifest, verbatim)
+     - browser-search/FAQ.md             (upstream FAQ, verbatim)
+     - browser-search/LICENSE            (MIT, preserved)
+
+   What's NOT included (excluded from tarball to keep size small):
+     - browser-search/node_modules/      (installed at setup time via `npm install`)
+     - browser-search/.git/              (vendored from a clean clone)
+     - browser-search/img/               (logos, not needed for operation)
+
+   Modifications made by this bundle (non-invasive, additive only):
+     - browser-search/README-STACK.md    (NEW — Layer W integration doc)
+     - browser-search/searxng-settings.yml (NEW — native no-Docker engine config)
+     - No changes to upstream source files (SKILL.md, scripts/, package.json)
+
+   Dependency notes:
+     - cloakbrowser ^0.6.3 — pinned, NOT upgraded to 0.7.x (0.7.x requires
+       a license key; 0.6.3 works key-free in headless/CI environments).
+       See browser-search/README-STACK.md "Version pinning rationale".
+     - playwright-core 1.64.1 — exact-pinned per upstream.
+     - mmdb-lib ^3.0.3, socks-proxy-agent ^10.1.0 — per upstream.
+
+────────────────────────────────────────────────────────────────────────
+2. SearXNG (referenced, not vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/searxng/searxng
+   License:   AGPL-3.0-or-later (upstream)
+   Used as:   External runtime dependency (Docker container or native Python)
+
+   This bundle does NOT include SearXNG source code. Users install it via:
+     - Docker: `docker compose --profile search up -d` (searxng image)
+     - Native: `git clone https://github.com/searxng/searxng && pip install -r requirements.txt`
+
+   The bundle ships only a configuration file:
+     - docker/searxng/settings.yml        (SearXNG config: JSON format on, limiter off)
+     - browser-search/searxng-settings.yml (duplicate for native no-Docker path)
+
+────────────────────────────────────────────────────────────────────────
+3. Camofox (referenced, not vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/jo-inc/camofox-browser
+   License:   See upstream (Docker image)
+   Used as:   Docker container on :9377 (tier 2 of browser-search)
+
+   This bundle does NOT include Camofox source. Users run it via:
+     - Docker: `docker compose --profile search up -d` (camofox image,
+       pinned to ghcr.io/jo-inc/camofox-browser:1.18.1)
+
+────────────────────────────────────────────────────────────────────────
+4. CloakBrowser (referenced, not vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/cloakhq/cloakbrowser
+   License:   See upstream (npm package + proprietary Chromium binary)
+   Used as:   npm dependency of browser-search (tier 3)
+
+   The CloakBrowser Chromium binary (~700 MB) is downloaded at install time
+   via `node -e "import('cloakbrowser').then(c => c.ensureBinary())"`.
+   The binary is SHA-256 verified by the cloakbrowser package.
+   This bundle uses the free tier (no license key required on 0.6.3).
+
+────────────────────────────────────────────────────────────────────────
+5. opencode-egress-router (Layer D, vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/Magiszonekk/opencode-egress-router
+   License:   See opencode-proxy/README-upstream.md
+   Vendor:    Magiszonekk
+
+   Included as a pre-built Go binary (opencode-proxy/opencode-egress-router)
+   plus source code (opencode-proxy/*.go, go.mod, go.sum). The binary is
+   built from the upstream source without modification.
+
+────────────────────────────────────────────────────────────────────────
+6. zen-unlimited (Layer G, vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/yuhp/opencode-models-discovery
+   License:   See zen-unlimited-linux/LICENSE (or upstream README)
+   Vendor:    yuhp
+
+   TypeScript source included verbatim in zen-unlimited-linux/src/.
+   The Linux port adds systemd user units (zen-unlimited-linux/scripts/)
+   and a v2-native provider config (zen-unlimited-linux/opencode/).
+
+────────────────────────────────────────────────────────────────────────
+7. SphinX (Layer C, referenced)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/opencode-ai/sphinx (or upstream as documented)
+   License:   See upstream
+   Used as:   Python source, adapted for Linux in sphinx-lite/src/
+
+   The sphinx-lite shim wraps the host's opencode binary. Source is included
+   with Linux-specific patches (fcntl mutex, Linux paths, no warp-cli).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+8. oc-proxy (Layer P, referenced — NOT vendored)
+   ──────────────────────────────────────────────────────────────────────
+   Upstream:  https://github.com/MarkDev11/oc-proxy
+   License:   NONE upstream (no LICENSE file — all rights reserved by
+              default). Version: commit 2a41370 (2026-10-16, master).
+   Author:    ARFANDI AZHAR (MarkDev11)
+
+   IMPORTANT: because upstream carries no license, this stack does NOT
+   redistribute oc-proxy's code. The tarball ships only:
+     - oc-proxy/server.js         (this stack's standalone adapter — MIT,
+                                   part of this bundle)
+     - oc-proxy/install-oc-proxy.sh (clones upstream at install time into
+                                   oc-proxy/upstream/, gitignored)
+     - oc-proxy/make-hf-space.sh  (assembles a HF Space from the locally
+                                   cloned upstream + the adapter)
+     - oc-proxy/deploy-oc-proxy-hf.sh (one-command Space deployment pipeline:
+                                   pin -> create -> secrets -> push -> validate
+                                   -> Layer B auto-apply at the RUNNING gate)
+     - oc-proxy/README-STACK.md   (Layer P integration doc)
+   Deployment status (2026-11-17): Docker Spaces on free cpu-basic require a
+   PRO subscription (HTTP 402 measured); pipeline validated locally 8/8.
+   Run `bash oc-proxy/install-oc-proxy.sh` to fetch the upstream code
+   locally for interoperability use. Contact the upstream author for
+   licensing questions or redistribution permission.
+
+────────────────────────────────────────────────────────────────────────
+
+For questions about upstream licensing or attribution, contact the
+respective upstream maintainers. This bundle's own license is MIT
+(see LICENSE in the bundle root).

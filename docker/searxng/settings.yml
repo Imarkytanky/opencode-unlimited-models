@@ -1,0 +1,36 @@
+# SearXNG settings for Layer W tier 1 (browser-search skill).
+# Mounted read-only by docker-compose.yml (profile "search").
+#
+# Requirements from skills/browser-search/README.md:
+#   - limiter: false — a local instance's limiter would block the skill's
+#     JSON requests from scripts/searxng/searxng.mjs
+#   - search.formats must include json — the skill parses JSON output
+#
+# SEARXNG_SECRET is expanded by the SearXNG entrypoint ($(env ...) syntax).
+# Generate one for production: python3 -c 'import secrets; print(secrets.token_hex())'
+
+use_default_settings: true
+
+server:
+  secret_key: "$(env SEARXNG_SECRET)"
+  limiter: false
+  image_proxy: true
+
+search:
+  safe_search: 0
+  autocomplete: "duckduckgo"
+  formats:
+    - html
+    - json
+
+engines:
+  - name: duckduckgo
+    disabled: false
+  - name: google
+    disabled: false
+  - name: bing
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: github
+    disabled: false

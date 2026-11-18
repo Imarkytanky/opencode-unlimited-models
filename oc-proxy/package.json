@@ -1,0 +1,7 @@
+{
+  "name": "oc-proxy-layer-p",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Layer P adapter for oc-proxy (MarkDev11/oc-proxy). CommonJS scope — upstream handlers use require().",
+  "type": "commonjs"
+}

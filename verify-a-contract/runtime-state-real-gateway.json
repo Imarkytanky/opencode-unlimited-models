@@ -1,0 +1,635 @@
+{
+  "id": "gateway",
+  "models": {
+    "kimi-k3": {
+      "modelID": "kimi-k3",
+      "name": "kimi-k3 (B-explicit)",
+      "capabilities": {
+        "tools": true
+      },
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      }
+    },
+    "big-pickle": {
+      "id": "big-pickle",
+      "limit": {
+        "context": 200000,
+        "output": 32000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "mimo-v2.6-flash-free": {
+      "id": "mimo-v2.6-flash-free",
+      "limit": {
+        "context": 200000,
+        "output": 32000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "deepseek-v4.1-flash-free": {
+      "id": "deepseek-v4.1-flash-free",
+      "limit": {
+        "context": 200000,
+        "output": 32000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "glm-5.3-flash-free": {
+      "id": "glm-5.3-flash-free",
+      "limit": {
+        "context": 200000,
+        "output": 32000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-fable-5-1": {
+      "id": "claude-fable-5-1",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-haiku-4-5": {
+      "id": "claude-haiku-4-5",
+      "limit": {
+        "context": 200000,
+        "output": 64000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-haiku-5-5": {
+      "id": "claude-haiku-5-5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-opus-5-5": {
+      "id": "claude-opus-5-5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-sonnet-5": {
+      "id": "claude-sonnet-5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-sonnet-5-5": {
+      "id": "claude-sonnet-5-5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "deepseek-v4.1-flash": {
+      "id": "deepseek-v4.1-flash",
+      "limit": {
+        "context": 1000000,
+        "output": 384000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "deepseek-v4-pro": {
+      "id": "deepseek-v4-pro",
+      "limit": {
+        "context": 1000000,
+        "output": 384000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gemini-3.5-flash-lite": {
+      "id": "gemini-3.5-flash-lite",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gemini-3.8-flash": {
+      "id": "gemini-3.8-flash",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gemini-4-argon": {
+      "id": "gemini-4-argon",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "glm-5.3": {
+      "id": "glm-5.3",
+      "limit": {
+        "context": 1000000,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "glm-5.3-flash": {
+      "id": "glm-5.3-flash",
+      "limit": {
+        "context": 1000000,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.3-codex": {
+      "id": "gpt-5.3-codex",
+      "limit": {
+        "context": 400000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.3-codex-spark": {
+      "id": "gpt-5.3-codex-spark",
+      "limit": {
+        "context": 128000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.4-mini": {
+      "id": "gpt-5.4-mini",
+      "limit": {
+        "context": 400000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.4-nano": {
+      "id": "gpt-5.4-nano",
+      "limit": {
+        "context": 400000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.5": {
+      "id": "gpt-5.5",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.5-pro": {
+      "id": "gpt-5.5-pro",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.6-luna": {
+      "id": "gpt-5.6-luna",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-6-astra": {
+      "id": "gpt-6-astra",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-6-sol": {
+      "id": "gpt-6-sol",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-6.1-sol": {
+      "id": "gpt-6.1-sol",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-6-luna": {
+      "id": "gpt-6-luna",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gpt-5.6-terra": {
+      "id": "gpt-5.6-terra",
+      "limit": {
+        "context": 1050000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "grok-4.7": {
+      "id": "grok-4.7",
+      "limit": {
+        "context": 500000,
+        "output": 500000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "grok-build-0.1": {
+      "id": "grok-build-0.1",
+      "limit": {
+        "context": 256000,
+        "output": 256000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "kimi-k2.7-code": {
+      "id": "kimi-k2.7-code",
+      "limit": {
+        "context": 262144,
+        "output": 262144
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "minimax-m3": {
+      "id": "minimax-m3",
+      "limit": {
+        "context": 512000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "muse-spark-1.3": {
+      "id": "muse-spark-1.3",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "muse-wonder-1.0": {
+      "id": "muse-wonder-1.0",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "mistral-large-4": {
+      "id": "mistral-large-4",
+      "limit": {
+        "context": 524288,
+        "output": 262144
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "qwen3.6-plus": {
+      "id": "qwen3.6-plus",
+      "limit": {
+        "context": 262144,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "qwen3.8-flash": {
+      "id": "qwen3.8-flash",
+      "limit": {
+        "context": 1000000,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "qwen3.8-max": {
+      "id": "qwen3.8-max",
+      "limit": {
+        "context": 262144,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "longcat-2.5-free": {
+      "id": "longcat-2.5-free",
+      "limit": {
+        "context": 1000000,
+        "output": 262144
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "iceman-free": {
+      "id": "iceman-free",
+      "limit": {
+        "context": 262144,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "inkling-2-small-free": {
+      "id": "inkling-2-small-free",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "beam-free": {
+      "id": "beam-free",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "flint-40b-free": {
+      "id": "flint-40b-free",
+      "limit": {
+        "context": 262144,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "nemotron-3.5-super-vl-free": {
+      "id": "nemotron-3.5-super-vl-free",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "nemotron-3.5-lightning-free": {
+      "id": "nemotron-3.5-lightning-free",
+      "limit": {
+        "context": 262144,
+        "output": 262144
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "muse-ember-1.0": {
+      "id": "muse-ember-1.0",
+      "limit": {
+        "context": 1048576,
+        "output": 270000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "claude-fable-5-2": {
+      "id": "claude-fable-5-2",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "minimax-m3.1-flash-free": {
+      "id": "minimax-m3.1-flash-free",
+      "limit": {
+        "context": 1000000,
+        "output": 512000
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gemini-4-carbon": {
+      "id": "gemini-4-carbon",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    },
+    "gemini-4-hydrogen": {
+      "id": "gemini-4-hydrogen",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        }
+      }
+    }
+  },
+  "_meta": {
+    "source": "simulated-A",
+    "gateway_url": "https://opencode.ai/inference/v1",
+    "disk_models_count": 1,
+    "gateway_models_count": 52,
+    "merged_count": 52
+  }
+}

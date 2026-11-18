@@ -1,0 +1,55 @@
+{
+  "verdict": "PASS",
+  "timestamp": "2026-11-14T05:40:16Z",
+  "contract": "A only adds, never overwrites",
+  "target_id": "kimi-k3",
+  "provider_id": "gateway",
+  "control_id": "glm-5.3-flash-free",
+  "embedding_id": "nonexistent-embedding-model",
+  "expected": {
+    "context": 1048576,
+    "output": 131072,
+    "control_context": 200000
+  },
+  "rich_metadata": true,
+  "match_count": 1,
+  "gw_model_count": 52,
+  "results": {
+    "C1_no_duplicate": {
+      "status": "PASS",
+      "detail": {
+        "runtime_state.json": 1
+      }
+    },
+    "C2_tools_preserved": {
+      "status": "preserved",
+      "detail": {}
+    },
+    "C3_limit_context": {
+      "status": "preserved",
+      "detail": {
+        "limit/context": 1048576
+      }
+    },
+    "C4_discovery_adds_missing": {
+      "status": "PASS",
+      "detail": {}
+    },
+    "C5_embeddings_skipped": {
+      "status": "PASS",
+      "detail": {}
+    },
+    "C6_control_enriched_with_context": {
+      "status": "enriched",
+      "detail": {
+        "limit/context": 200000
+      }
+    },
+    "C7_B_limit_output_preserved": {
+      "status": "preserved",
+      "detail": {
+        "limit/output": 131072
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "opencode-unlimited-models",
+  "version": "14.0.0",
+  "private": true,
+  "description": "Unlimited-models stack for opencode v2 — single-key access to 53+ models (paid and free) via the opencode Console inference gateway, with Zen free-tier gate bypass, ghost reconciliation, VPS proxy fleet, Cloudflare Workers edge proxy, and browser-search web research skill (Layer W).",
+  "type": "module",
+  "scripts": {
+    "example:zen-free": "bun run examples/index.zen-free.ts",
+    "example:opencode": "bun run examples/index.opencode.ts",
+    "example:gateway": "bun run examples/index.ts",
+    "example:workaround": "bun run examples/index.workaround.ts",
+    "example:layer-w": "bun run examples/index.layer-w.ts",
+    "example:layer-w-compare": "bun run examples/index.layer-w-compare.ts",
+    "example:layer-w-multilingual": "bun run examples/index.layer-w-multilingual.ts",
+    "test:e2e": "bash test-e2e.sh",
+    "test:contract": "bash verify-a-contract/verify-a-contract.sh --simulate --mock --rich-metadata --simulate-d-thin --schema v2",
+    "test:contract-real": "bash verify-a-contract/verify-a-contract.sh --simulate --simulate-d-thin --gateway-url https://opencode.ai/inference/v1 --rich-metadata --schema v2",
+    "test:plugin": "cd plugins && bun test reconcile.test.ts",
+    "test:selftest": "bash verify-a-contract/verify-a-contract.sh --selftest",
+    "test:smoke": "bash verify-a-contract/verify-a-contract.sh --smoke-gateway",
+    "test:all": "bun run test:selftest && bun run test:smoke && bun run test:contract && bun run test:plugin",
+    "test:w": "bash verify-browser-search.sh --quick",
+    "test:w:full": "bash verify-browser-search.sh",
+    "test:e2e:w": "bash test-e2e.sh --layer w",
+    "bench:w": "bash benchmark-layer-w.sh --runs 3",
+    "bench:w:quick": "bash benchmark-layer-w.sh --quick --runs 3",
+    "bs:status": "bash bs-bridge.sh status",
+    "bs:fetch": "bash bs-bridge.sh fetch",
+    "bs:install": "cd browser-search && npm install && node -e \"import('cloakbrowser').then(c=>c.ensureBinary())\"",
+    "oc:install": "bash oc-proxy/install-oc-proxy.sh",
+    "oc:dev": "node oc-proxy/server.js",
+    "oc:test": "bash verify-oc-proxy.sh",
+    "oc:test:quick": "bash verify-oc-proxy.sh --quick",
+    "oc:hf": "bash oc-proxy/make-hf-space.sh --check",
+    "oc:deploy": "bash oc-proxy/deploy-oc-proxy-hf.sh",
+    "example:oc-agent": "bun run examples/index.oc-proxy-agent.ts",
+    "update:deps": "bun update && cd plugins && bun update && cd ../cf-worker-proxy && bun update && cd ..",
+    "cf:dev": "cd cf-worker-proxy && npx wrangler dev --port 8787",
+    "cf:deploy": "cd cf-worker-proxy && npx wrangler deploy",
+    "launch:unified": "bash sphinx-lite/launch-unified.sh",
+    "launch:proxy": "bash opencode-proxy/launch-oc-proxy.sh",
+    "install:sphinx-lite": "bash sphinx-lite/install-sphinx-lite.sh",
+    "uninstall:sphinx-lite": "bash sphinx-lite/install-sphinx-lite.sh --uninstall",
+    "vps:list": "bash vps-proxy/rotate-egress.sh list",
+    "vps:add": "bash vps-proxy/rotate-egress.sh add",
+    "vps:test": "bash vps-proxy/rotate-egress.sh test",
+    "vps:generate": "bash vps-proxy/rotate-egress.sh generate"
+  },
+  "dependencies": {
+    "ai": "^7.0.173",
+    "@ai-sdk/openai-compatible": "^3.0.92",
+    "@opencode/plugin": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "wrangler": "^4.163.0"
+  },
+  "trustedDependencies": [
+    "@opencode/plugin"
+  ],
+  "engines": {
+    "bun": ">=1.3.0"
+  }
+}

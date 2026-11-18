@@ -1,0 +1,85 @@
+# GitHub Pages (Jekyll) config for opencode-unlimited-models
+# Docs: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll
+
+title: opencode-unlimited-models
+description: >-
+  opencode v2 unlimited model stack v13.0.0 — 10 layers (A→P), single-key access
+  to 52+ models, deterministic web research, hosted off-box loop, at $0 model cost.
+tagline: Single-key 52-model access · Layer W web research · Layer P hosted gateway
+url: https://imarkytanky.github.io
+baseurl: /opencode-unlimited-models
+
+# Use the default GitHub Pages theme (Cayman) — minimal config, zero build pipeline
+theme: jekyll-theme-cayman
+
+# Markdown processing
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+# Plugins (whitelisted by GitHub Pages)
+plugins:
+  - jekyll-readme-index
+  - jekyll-relative-links
+  - jekyll-titles-from-headings
+  - jekyll-optional-front-matter
+  - jekyll-default-layout
+  - jekyll-redirect-from
+
+# Read README.md as the homepage
+readme_index:
+  enabled: true
+  remove_originals: true
+
+# Relative-link conversion (so README.md links to ./INSTALL.md work on the site)
+relative_links:
+  enabled: true
+  collections: true
+
+# Exclude build artifacts from Pages
+exclude:
+  - node_modules/
+  - upstream/
+  - dist/
+  - "*.bak-*"
+  - __pycache__/
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+
+# GitHub metadata
+github:
+  repository_nwo: Imarkytanky/opencode-unlimited-models
+  owner_name: Imarkytanky
+
+# Site-wide defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Navigation (sidebar links — rendered by the Cayman theme)
+navigation:
+  - title: Home
+    url: /
+  - title: Quick Start
+    url: /QUICKSTART
+  - title: Install
+    url: /INSTALL
+  - title: Changelog
+    url: /CHANGELOG
+  - title: Layer W
+    url: /browser-search/README-STACK
+  - title: Layer P
+    url: /oc-proxy/README-STACK
+  - title: GitHub
+    url: https://github.com/Imarkytanky/opencode-unlimited-models

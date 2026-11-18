@@ -1,0 +1,16 @@
+{
+  "name": "cf-worker-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Workers HTTP forward proxy — automatic edge IP rotation for OpenCode Zen",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "wrangler dev --port 8787 & sleep 3 && bash test-proxy.sh"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261116.1",
+    "wrangler": "^4.163.0"
+  }
+}

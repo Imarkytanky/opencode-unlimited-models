@@ -1,0 +1,94 @@
+# docker-compose.yml — kiri/docker compose config for the full stack
+#
+# Usage:
+#   kiri compose up -d      # start all services
+#   kiri compose down        # stop all services
+#   kiri compose logs -f     # follow logs
+#   kiri compose ps           # status
+#
+# Or with docker:
+#   docker compose up -d
+#   docker compose down
+#
+# Layer W (browser-search, optional): docker compose --profile search up -d
+#   - searxng :8080 (metasearch, tier 1)   - camofox :9377 (REST browser, tier 2)
+#   CloakBrowser (tier 3) needs no container — it runs from browser-search/
+
+services:
+  oc-stack:
+    build: .
+    image: opencode-unlimited:latest
+    container_name: oc-stack
+    ports:
+      - "8318:8318"     # opencode-egress-router (Magiszonekk, Zen free-tier gate bypass)
+      - "20128:20128"   # zen-unlimited gateway (muse-spark, /v1/responses)
+      # - "1090:1090"   # zen-unlimited relay (internal only, no need to expose)
+    environment:
+      # Pass through the host's OPENCODE_API_KEY for paid model access
+      - OPENCODE_API_KEY=${OPENCODE_API_KEY:-}
+    volumes:
+      # Persist logs outside the container
+      - oc-logs:/var/log/supervisor
+      # Optionally mount a custom opencode.json (comment out to use the baked-in one)
+      # - ./config/opencode.json:/app/config/opencode.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8318/__router/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # Layer W tier 1 — SearXNG metasearch (browser-search skill)
+  # Config lives in docker/searxng/settings.yml (limiter off, JSON format on).
+  # ---------------------------------------------------------------------------
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    profiles: ["search"]
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./docker/searxng:/etc/searxng:ro
+    environment:
+      - SEARXNG_BASE_URL=http://127.0.0.1:8080/
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETGID, SETUID]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Layer W tier 2 — Camofox REST browser (browser-search skill)
+  # Flags mirror browser-search/docker/setup.md (security hardening).
+  # ---------------------------------------------------------------------------
+  camofox:
+    image: ghcr.io/jo-inc/camofox-browser:1.18.1
+    container_name: camofox-browser
+    profiles: ["search"]
+    ports:
+      - "127.0.0.1:9377:9377"
+    environment:
+      - CAMOFOX_CRASH_REPORT_ENABLED=false
+      - MAX_OLD_SPACE_SIZE=512
+      - CAMOFOX_API_KEY=${CAMOFOX_API_KEY:-}
+      - CAMOFOX_ADMIN_KEY=${CAMOFOX_ADMIN_KEY:-}
+    tmpfs:
+      - /tmp
+      - /home/camofox/.cache
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges
+    ulimits:
+      core: 0
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    restart: unless-stopped
+
+volumes:
+  oc-logs:

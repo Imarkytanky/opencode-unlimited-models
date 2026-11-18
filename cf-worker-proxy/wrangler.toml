@@ -1,0 +1,12 @@
+name = "opencode-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+# Optional: set an API key to restrict access to your proxy
+# [vars]
+# PROXY_API_KEY = "your-secret-key-here"
+
+# To deploy:
+#   1. npx wrangler login   (opens browser for Cloudflare auth)
+#   2. npx wrangler deploy
+#   3. Your proxy URL: https://opencode-proxy.<your-subdomain>.workers.dev

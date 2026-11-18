@@ -1,0 +1,55 @@
+{
+  "verdict": "PASS",
+  "timestamp": "2026-11-14T04:33:19Z",
+  "contract": "A only adds, never overwrites",
+  "target_id": "qwen3-coder",
+  "provider_id": "gateway",
+  "control_id": "llama-3.3-70b",
+  "embedding_id": "text-embedding-3-large",
+  "expected": {
+    "context": 131072,
+    "output": 65536,
+    "control_context": 128000
+  },
+  "rich_metadata": true,
+  "match_count": 1,
+  "gw_model_count": 2,
+  "results": {
+    "C1_no_duplicate": {
+      "status": "PASS",
+      "detail": {
+        "runtime_state.json": 1
+      }
+    },
+    "C2_tools_preserved": {
+      "status": "preserved",
+      "detail": {}
+    },
+    "C3_limit_context": {
+      "status": "preserved",
+      "detail": {
+        "limit/context": 131072
+      }
+    },
+    "C4_discovery_adds_missing": {
+      "status": "PASS",
+      "detail": {}
+    },
+    "C5_embeddings_skipped": {
+      "status": "PASS",
+      "detail": {}
+    },
+    "C6_control_enriched_with_context": {
+      "status": "enriched",
+      "detail": {
+        "limit/context": 128000
+      }
+    },
+    "C7_B_limit_output_preserved": {
+      "status": "preserved",
+      "detail": {
+        "limit/output": 65536
+      }
+    }
+  }
+}

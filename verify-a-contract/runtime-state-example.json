@@ -1,0 +1,29 @@
+{
+  "id": "gateway",
+  "models": {
+    "qwen3-coder": {
+      "modelID": "qwen3-coder",
+      "name": "Qwen3 Coder (B-explicit)",
+      "capabilities": {
+        "tools": true
+      },
+      "limit": {
+        "context": 131072,
+        "output": 65536
+      }
+    },
+    "llama-3.3-70b": {
+      "id": "llama-3.3-70b",
+      "limit": {
+        "context": 128000
+      }
+    }
+  },
+  "_meta": {
+    "source": "simulated-A",
+    "gateway_url": "http://127.0.0.1:18685/v1",
+    "disk_models_count": 1,
+    "gateway_models_count": 3,
+    "merged_count": 2
+  }
+}

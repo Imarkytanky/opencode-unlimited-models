@@ -1,0 +1,13 @@
+# SearXNG config for Layer W (browser-search). Randomize secret_key for any non-local use.
+use_default_settings: true
+server:
+  secret_key: "bs-integration-local-secret-2026"
+  limiter: false
+  image_proxy: false
+  bind_address: "127.0.0.1"
+  port: 8080
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json

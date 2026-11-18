@@ -1,0 +1,396 @@
+# .github/workflows/test.yml — CI for the opencode-unlimited-models-final bundle
+#
+# Runs on every push and pull request. Validates:
+#   1. Bash syntax of verify-a-contract.sh + install-sphinx-lite.sh + launch-unified.sh
+#   2. The assertion engine selftest (PASS fixture → PASS, FAIL fixture → FAIL)
+#   3. The mock gateway smoke test (boots, /health 200, /v1/models auth enforced)
+#   4. The simulate mode against the embedded mock (Layer A contract: 7/7 PASS)
+#   5. The simulate mode against the real opencode Console gateway (Layer A contract: 7/7 PASS)
+#      — only when the OPENCODE_API_KEY secret is set
+#   6. The full B+A+D_thin contract (Layer A + Layer D_thin: 9/9 PASS)
+#      — only when the OPENCODE_API_KEY secret is set
+#   7. The reconcile plugin unit tests (7/7 PASS via bun:test)
+#
+# Secrets:
+#   OPENCODE_API_KEY — oc_sk_... key from https://opencode.ai/console
+#                     (optional; tests 5+6 are skipped if unset)
+#
+# Costs:
+#   Test 5+6 each make 1 GET to /v1/models (free, no chat completions).
+#   No paid model invocations.
+#   Estimated cost per CI run: $0.00
+
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    # Daily at 03:30 UTC — runs the full Layer W contract (with Chromium download)
+    - cron: "30 3 * * *"
+
+# Cancel in-progress runs for the same ref when a new commit lands.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  syntax-and-selftest:
+    name: Syntax + E2E quick + mock contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bash syntax check (all scripts)
+        run: |
+          set -e
+          find . -name '*.sh' -not -path './.git/*' -not -path './node_modules/*' -exec bash -n {} \;
+          echo "All shell scripts: syntax OK"
+
+      - name: Install deps
+        run: bun install
+
+      - name: Install plugin deps
+        run: cd plugins && bun install
+
+      - name: Install zen-unlimited deps
+        run: cd zen-unlimited-linux && bun install
+
+      - name: Layer W structural check (no Chromium download)
+        run: |
+          set -e
+          # Fast checks that the Layer W integration is wired up correctly.
+          # Heavy checks (CloakBrowser live fetch, ~700 MB Chromium) live in the
+          # daily `layer-w-full` job below.
+          test -f browser-search/SKILL.md
+          test -f browser-search/package.json
+          test -f browser-search/README-STACK.md
+          test -f browser-search/searxng-settings.yml
+          test -f docker/searxng/settings.yml
+          test -x bs-bridge.sh
+          test -x verify-browser-search.sh
+          test -x benchmark-layer-w.sh
+          test -f NOTICE
+          test -f examples/index.layer-w.ts
+          test -f examples/index.layer-w-compare.ts
+          test -f examples/index.layer-w-multilingual.ts
+          # SKILL.md frontmatter must declare the skill name
+          head -5 browser-search/SKILL.md | grep -q 'name: "browser-search"'
+          # package.json version must appear in the changelog
+          BS_VER=$(python3 -c "import json; print(json.load(open('browser-search/package.json'))['version'])")
+          grep -q "$BS_VER" CHANGELOG.md
+          grep -qi "browser-search" CHANGELOG.md
+          # Compose profile must define both Layer W services
+          grep -q 'searxng:' docker-compose.yml
+          grep -q 'camofox:' docker-compose.yml
+          grep -q 'profiles:.*search' docker-compose.yml
+          # Dockerfile must include Layer W
+          grep -q 'Layer W' Dockerfile
+          grep -q 'browser-search' Dockerfile
+          # package.json must have Layer W shortcuts
+          grep -q '"test:w"' package.json
+          grep -q '"bench:w"' package.json
+          grep -q '"bs:install"' package.json
+          # All shell scripts must pass syntax check
+          bash -n bs-bridge.sh verify-browser-search.sh benchmark-layer-w.sh
+          echo "Layer W structural check: PASS (v$BS_VER, all files present, compose profile defined)"
+
+      - name: Layer P structural check (oc-proxy, no upstream clone)
+        run: |
+          set -e
+          # Layer P ships adapter + tooling only (upstream is cloned at install
+          # time — no LICENSE upstream, so not redistributed). Verify what ships.
+          test -f oc-proxy/server.js
+          test -x oc-proxy/install-oc-proxy.sh
+          test -x oc-proxy/make-hf-space.sh
+          test -f oc-proxy/README-STACK.md
+          test -f oc-proxy/package.json
+          test -f verify-oc-proxy.sh
+          node --check oc-proxy/server.js
+          bash -n oc-proxy/install-oc-proxy.sh oc-proxy/make-hf-space.sh verify-oc-proxy.sh
+          # CommonJS scope so require() works under the stack's "type": "module"
+          python3 -c "import json; d=json.load(open('oc-proxy/package.json')); assert d.get('type')=='commonjs'"
+          # package.json must have Layer P shortcuts
+          grep -q '"oc:install"' package.json
+          grep -q '"oc:hf"' package.json
+          echo "Layer P structural check: PASS (adapter + installer + HF packager present, CJS scope ok)"
+
+      - name: E2E quick test (7 layers, ~15s)
+        run: bash test-e2e.sh --quick
+
+      - name: Selftest (assertion engine)
+        run: bash verify-a-contract/verify-a-contract.sh --selftest
+
+      - name: Smoke test (mock gateway)
+        run: bash verify-a-contract/verify-a-contract.sh --smoke-gateway
+
+      - name: Simulate (mock, A-only contract — 7/7)
+        run: |
+          bash verify-a-contract/verify-a-contract.sh \
+            --simulate --mock --rich-metadata --schema v2 \
+            --keep --artifacts-dir ./artifacts-mock-a
+
+      - name: Simulate (mock, A+D_thin contract — 9/9)
+        run: |
+          bash verify-a-contract/verify-a-contract.sh \
+            --simulate --mock --rich-metadata --simulate-d-thin --schema v2 \
+            --keep --artifacts-dir ./artifacts-mock-d-thin
+
+      - name: Verify verdicts are PASS
+        run: |
+          python3 -c "
+          import json
+          for label, path in [('mock-A', './artifacts-mock-a/verdict.json'),
+                              ('mock-D-thin', './artifacts-mock-d-thin/verdict.json')]:
+              v = json.load(open(path))
+              assert v['verdict'] == 'PASS', f'{label}: expected PASS, got {v[\"verdict\"]}'
+              fail_count = sum(1 for r in v['results'].values() if r['status'] in ('FAIL', 'clobbered', 'missing', 'missing_or_wrong'))
+              assert fail_count == 0, f'{label}: {fail_count} failed assertions'
+              print(f'{label}: PASS ({len(v[\"results\"])} assertions)')
+          "
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mock-contract-verdicts
+          path: |
+            artifacts-mock-a/verdict.json
+            artifacts-mock-a/runtime_state.json
+            artifacts-mock-d-thin/verdict.json
+            artifacts-mock-d-thin/runtime_state.json
+
+  reconcile-plugin-unit-tests:
+    name: Reconcile plugin unit tests (7/7)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install @opencode/plugin types
+        working-directory: plugins
+        run: bun add @opencode/plugin
+
+      - name: TypeScript compile check
+        working-directory: plugins
+        run: bun build --no-bundle reconcile.ts
+
+      - name: Run unit tests
+        working-directory: plugins
+        run: bun test reconcile.test.ts
+
+      - name: Verify all 7 tests passed
+        working-directory: plugins
+        run: |
+          bun test reconcile.test.ts 2>&1 | tee /tmp/test-output.txt
+          # Bun exits 0 on success, non-zero on failure
+          # We additionally assert the test count
+          grep -E '^\s*7 pass' /tmp/test-output.txt || {
+            echo "ERROR: expected 7 passing tests"
+            exit 1
+          }
+          grep -E '^\s*0 fail' /tmp/test-output.txt || {
+            echo "ERROR: expected 0 failing tests"
+            exit 1
+          }
+
+  real-gateway-contract:
+    name: Real gateway contract (7/7 A-only, 9/9 A+D_thin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Only run if the secret is set; skip otherwise (no failure).
+    if: ${{ github.event_name == 'workflow_dispatch' || github.secret_source == 'Actions' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check OPENCODE_API_KEY secret presence
+        id: has-key
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          if [ -n "$OPENCODE_API_KEY" ]; then
+            echo "has_key=true" >> $GITHUB_OUTPUT
+            echo "OPENCODE_API_KEY length: ${#OPENCODE_API_KEY}"
+          else
+            echo "has_key=false" >> $GITHUB_OUTPUT
+            echo "OPENCODE_API_KEY secret not set — skipping real-gateway tests"
+          fi
+
+      - name: Simulate against real gateway (A-only, 7/7)
+        if: steps.has-key.outputs.has_key == 'true'
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          TARGET_ID="kimi-k3" \
+          CONTROL_ID="glm-5.3-flash-free" \
+          EMBEDDING_ID="nonexistent-embedding-model" \
+          EXPECTED_CONTEXT="1048576" \
+          EXPECTED_OUTPUT="131072" \
+          CONTROL_CONTEXT="200000" \
+          bash verify-a-contract/verify-a-contract.sh \
+            --simulate --gateway-url https://opencode.ai/inference/v1 \
+            --api-key "$OPENCODE_API_KEY" \
+            --rich-metadata --schema v2 \
+            --keep --artifacts-dir ./artifacts-real-a
+
+      - name: Simulate against real gateway (A+D_thin, 9/9)
+        if: steps.has-key.outputs.has_key == 'true'
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          TARGET_ID="kimi-k3" \
+          CONTROL_ID="glm-5.3-flash-free" \
+          EMBEDDING_ID="nonexistent-embedding-model" \
+          EXPECTED_CONTEXT="1048576" \
+          EXPECTED_OUTPUT="131072" \
+          CONTROL_CONTEXT="200000" \
+          GHOST_ID="legacy-removed-model" \
+          bash verify-a-contract/verify-a-contract.sh \
+            --simulate --simulate-d-thin \
+            --gateway-url https://opencode.ai/inference/v1 \
+            --api-key "$OPENCODE_API_KEY" \
+            --rich-metadata --schema v2 \
+            --keep --artifacts-dir ./artifacts-real-d-thin
+
+      - name: Verify real-gateway verdicts
+        if: steps.has-key.outputs.has_key == 'true'
+        run: |
+          python3 -c "
+          import json
+          for label, path, expected_count in [
+              ('real-A', './artifacts-real-a/verdict.json', 9),  # 7 active + 2 skipped
+              ('real-D-thin', './artifacts-real-d-thin/verdict.json', 9),
+          ]:
+              v = json.load(open(path))
+              assert v['verdict'] == 'PASS', f'{label}: expected PASS, got {v[\"verdict\"]}'
+              assert len(v['results']) == expected_count, f'{label}: expected {expected_count} results, got {len(v[\"results\"])}'
+              fail_count = sum(1 for r in v['results'].values() if r['status'] in ('FAIL', 'clobbered', 'missing', 'missing_or_wrong'))
+              assert fail_count == 0, f'{label}: {fail_count} failed assertions'
+              print(f'{label}: PASS ({expected_count} assertions)')
+          "
+
+      - name: Upload real-gateway artifacts
+        if: always() && steps.has-key.outputs.has_key == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-gateway-verdicts
+          path: |
+            artifacts-real-a/verdict.json
+            artifacts-real-a/runtime_state.json
+            artifacts-real-d-thin/verdict.json
+            artifacts-real-d-thin/runtime_state.json
+
+  layer-w-full:
+    name: Layer W full contract + benchmark (with Chromium, ~10 min)
+    # Runs daily at 03:30 UTC and on manual dispatch only — too heavy for
+    # per-PR gating (~700 MB Chromium download + live stealth fetches).
+    # PRs get the fast structural check in `syntax-and-selftest` above.
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Layer W dependencies
+        working-directory: browser-search
+        run: |
+          npm install
+          node -e "import('cloakbrowser').then(c => c.ensureBinary())"
+
+      - name: Layer W quick contract (CloakBrowser tier, ~20s)
+        run: bash verify-browser-search.sh --quick
+
+      - name: Layer W full contract (with native SearXNG engine, ~3 min)
+        env:
+          SEARXNG_SRC: /tmp/searxng-src
+        run: |
+          git clone --depth 1 https://github.com/searxng/searxng /tmp/searxng-src
+          pip install -r /tmp/searxng-src/requirements.txt
+          bash verify-browser-search.sh
+
+      - name: Layer W benchmark (3 runs per test)
+        env:
+          SEARXNG_SRC: /tmp/searxng-src
+        run: bash benchmark-layer-w.sh --runs 3
+
+      - name: Bridge fetch smoke test
+        run: |
+          bash bs-bridge.sh status
+          timeout 90 bash bs-bridge.sh fetch "https://example.com" 2>/dev/null \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('chars',0) > 50; print(f'bridge fetch OK: {d[\"chars\"]} chars')"
+
+      - name: Upload Layer W logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layer-w-contract-logs
+          path: |
+            /tmp/verify-browser-search/*.json
+            /tmp/verify-browser-search/*.log
+            /tmp/verify-browser-search/*.txt
+            /tmp/benchmark-layer-w/*.tsv
+            /tmp/benchmark-layer-w/*.json
+
+  layer-p-full:
+    name: Layer P contract (oc-proxy boot + live upstream, ~5 min)
+    # Daily + manual dispatch. Clones upstream oc-proxy (pinned), boots the
+    # adapter, and runs the 8-assertion contract including the live
+    # fingerprint proof (200 or 429 FreeUsageLimitError = accepted).
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install upstream oc-proxy (pinned)
+        run: bash oc-proxy/install-oc-proxy.sh
+
+      - name: Layer P contract test (8 assertions, live upstream)
+        run: bash verify-oc-proxy.sh
+
+      - name: HF Space packaging check
+        run: bash oc-proxy/make-hf-space.sh --check
+
+      - name: Upload Layer P logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layer-p-contract-logs
+          path: |
+            /tmp/verify-oc-proxy/*.json
+            /tmp/verify-oc-proxy/*.log
+            /tmp/verify-oc-proxy/*.html
